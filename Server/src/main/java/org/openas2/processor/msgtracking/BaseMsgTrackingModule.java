@@ -9,6 +9,7 @@ import org.openas2.message.MessageMDN;
 import org.openas2.partner.Partnership;
 import org.openas2.processor.BaseProcessorModule;
 import org.openas2.processor.resender.ResenderModule;
+import org.openas2.util.AS2Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +81,7 @@ public abstract class BaseMsgTrackingModule extends BaseProcessorModule implemen
         map.put(FIELDS.CONTENT_TYPE, msg.getContentType());
         map.put(FIELDS.CONTENT_TRANSFER_ENCODING, msg.getHeader("Content-Transfer-Encoding"));
         map.put(FIELDS.MDN_MODE, (msg.getPartnership().isAsyncMDN() ? "ASYNC" : "SYNC"));
-
+        map.put(FIELDS.MSG_DATA, AS2Util.getData(msg));
         return map;
     }
 
@@ -105,6 +106,7 @@ public abstract class BaseMsgTrackingModule extends BaseProcessorModule implemen
         public static final String MDN_MODE = "mdn_mode";
         public static final String MDN_RESPONSE = "mdn_response";
         public static final String STATE_MSG = "state_msg";
+        public static final String MSG_DATA = "msg_data";
         public static final String CREATE_DT = "create_dt";
         public static final String UPDATE_DT = "update_dt";
     }

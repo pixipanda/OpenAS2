@@ -35,12 +35,7 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -640,6 +635,42 @@ public class AS2Util {
         }
 
     }
+
+
+    /*
+     * @description This method extracts the actual data as string from the AS2Message
+     *
+     * @param msg - the Message object containing the actual data
+     */
+
+    public static String getData(Message msg) {
+        Log logger = LogFactory.getLog(AS2Util.class.getSimpleName());
+        MimeBodyPart mimeBodyPart = msg.getData();
+        StringBuilder msgData = new StringBuilder();
+        try {
+            javax.mail.util.ByteArrayDataSource byteSource =  (javax.mail.util.ByteArrayDataSource)mimeBodyPart.getDataHandler().getDataSource();
+            InputStream inputStream = byteSource.getInputStream();
+            String newLine = System.getProperty("line.separator");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            for (String line; (line = reader.readLine()) != null; ) {
+                if (msgData.length() > 0) {
+                    msgData.append(newLine);
+                }
+                msgData.append(line);
+            }
+            reader.close();
+
+        } catch (MessagingException me) {
+            logger.error("Error extracting data" + me);
+            return  null;
+        } catch (IOException ie) {
+            logger.error("Error extracting data" + ie);
+            return  null;
+        }
+        return msgData.toString();
+    }
+
 
     public static void cleanupFiles(Message msg, boolean isError) {
         Log logger = LogFactory.getLog(AS2Util.class.getSimpleName());
